@@ -7,6 +7,7 @@ import glob
 import re
 import zipfile
 import configparser
+import argparse
 
 # TODO: smarter cores link creation
 # TODO: cleanup cores links
@@ -20,6 +21,16 @@ STARTUP_SCRIPT = "/media/fat/linux/user-startup.sh"
 EXTERNAL_FOLDER = "/media/usb0"
 if os.path.exists(os.path.join(EXTERNAL_FOLDER, "games")):
     EXTERNAL_FOLDER = os.path.join(EXTERNAL_FOLDER, "games")
+
+# sets up the argument parser for non-dialog use
+parser = argparse.ArgumentParser(description='Manage favorites with a GUI or from CLI. Run with no arguments to open the GUI',
+                                 epilog='--game and --core cannot be used together. Please be aware that using this program in CLI mode assumes you understand what you are doing. It is only recommended for advanced users.',)
+parser.add_argument('--refresh', help='Refreshes the currently added favorites', dest='refresh', action='store_true')
+parser.add_argument('--game',    help='Full path to a game file that is supported by the associated core (e.g. SFC/CUE/CHD)')
+parser.add_argument('--core',    help='Full path to your core of choice')
+parser.add_argument('--output',  help='Full path to an (existing) MGL file - this determines both the location and display name of the entry')
+parser.add_argument('--delete',  help='If used with --output, delete referenced MGL file')
+parsed_args = parser.parse_args()
 
 # by default hide all the unnecessary files in the SD root when browsing
 HIDE_SD_FILES = True
@@ -1130,8 +1141,7 @@ def setup_arcade_files():
 
 if __name__ == "__main__":
     try_add_to_startup()
-
-    if len(sys.argv) == 2 and sys.argv[1] == "refresh":
+    if parsed_args.refresh == True:
         refresh_favorites()
     else:
         create_default_favorites()
